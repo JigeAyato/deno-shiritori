@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset = "utf-8">
+    <link rel = "stylesheet" href = "styles1.css">
+    <style>
+        .bd-placeholder-img {
+          font-size: 1.125rem;
+          text-anchor: middle;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          user-select: none;
+        }
+  
+        @media (min-width: 768px) {
+          .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+          }
+        }
+      </style>
+</head>
+
+<body>
+    <div class="navbar navbar-dark bg-dark shadow-sm">
+        <div class="container">
+          <a class="navbar-brand d-flex align-items-center">
+            <strong>しりとり</strong>
+          </a>
+        </div>
+    </div>
+    <section class="py-5 text-center container">
+        <div class="row py-lg-5">
+          <div class="col-lg-6 col-md-8 mx-auto">
+            <h1>文字を入力してください</h1>
+            <p id = "previousWord"></p>
+            <input id = "nextWordInput"type="text">
+            <button id = "nextWordSendButton"class="btn btn-primary my-2">送信</button>
+            <p class="lead text-muted">※同じ単語は入力できません</p>
+            <p class="lead text-muted">※平仮名以外は入力できません</p>
+          </div>
+        </div>
+    </section>
+
+    <script type = "module">
+        window.onload = async(event) =>{
+            const response = await fetch("/shiritori");
+            const previousWord = await response.text();
+
+            const para = document.querySelector("#previousWord");
+            para.innerText = `前の単語：${previousWord}`;
+        };
+        document.querySelector("#nextWordSendButton").onclick = async(event) => {
+            const nextWord = document.querySelector("#nextWordInput").value;
+            const response = await fetch("/shiritori",{
+                method: "POST",
+                headers: {"Content-Type":"application/json"},
+                body: JSON.stringify({nextWord})
+            });
+            if(response.status/100 !==2){
+                alert(await response.text());
+                return;
+            }
+
+            const previousWord = await response.text();
+
+            const para = document.querySelector("#previousWord");
+            para.innerText = `前の単語：${previousWord}`;
+        }
+    </script>
+</body>
+
+</html>
